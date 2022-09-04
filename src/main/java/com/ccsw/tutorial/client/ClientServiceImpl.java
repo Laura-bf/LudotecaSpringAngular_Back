@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.ccsw.tutorial.client.model.Client;
 import com.ccsw.tutorial.client.model.ClientDto;
 import com.ccsw.tutorial.exception.NotAvailableForUseException;
-import com.ccsw.tutorial.exception.ResourceNotFoundException;
 
 @Service
 public class ClientServiceImpl implements ClientService {
@@ -23,7 +22,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void save(Long id, ClientDto clientDto) throws NotAvailableForUseException, ResourceNotFoundException {
+    public void save(Long id, ClientDto clientDto) throws NotAvailableForUseException {
 
         if (!this.clientRepository.findByName(clientDto.getName()).isEmpty())
             throw new NotAvailableForUseException("Name already registered");
@@ -33,7 +32,7 @@ public class ClientServiceImpl implements ClientService {
         if (id == null)
             client = new Client();
         else
-            client = this.clientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+            client = this.clientRepository.findById(id).orElse(null);
 
         client.setName(clientDto.getName());
 
@@ -41,11 +40,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void delete(Long id) throws ResourceNotFoundException {
-        try {
-            this.clientRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new ResourceNotFoundException(e.getMessage());
-        }
+    public void delete(Long id) {
+        this.clientRepository.deleteById(id);
     }
 }

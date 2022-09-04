@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ccsw.tutorial.client.model.ClientDto;
 import com.ccsw.tutorial.exception.NotAvailableForUseException;
-import com.ccsw.tutorial.exception.ResourceNotFoundException;
 import com.devonfw.module.beanmapping.common.api.BeanMapper;
 
 @RestController
@@ -36,12 +35,12 @@ public class ClientController {
 
     @PutMapping(path = { "", "/{id}" })
     public void save(@PathVariable(name = "id", required = false) Long id, @RequestBody ClientDto clientDto)
-            throws NotAvailableForUseException, ResourceNotFoundException {
+            throws NotAvailableForUseException {
         this.clientService.save(id, clientDto);
     }
 
     @DeleteMapping(path = "/{id}")
-    public void delete(@PathVariable("id") Long id) throws ResourceNotFoundException {
+    public void delete(@PathVariable("id") Long id) {
         this.clientService.delete(id);
     }
 }

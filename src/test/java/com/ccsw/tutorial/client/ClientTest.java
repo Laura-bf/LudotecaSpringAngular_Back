@@ -21,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.ccsw.tutorial.client.model.Client;
 import com.ccsw.tutorial.client.model.ClientDto;
 import com.ccsw.tutorial.exception.NotAvailableForUseException;
-import com.ccsw.tutorial.exception.ResourceNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class ClientTest {
@@ -29,7 +28,6 @@ public class ClientTest {
     private static final String EXISTS_CLIENT_NAME = "repeatedName";
     private static final String NEW_CLIENT_NAME = "Aidan Payne";
     private static final Long EXISTS_CLIENT_ID = 1L;
-    private static final Long NEW_CLIENT_ID = 7L;
 
     @Mock
     private ClientRepository clientRepository;
@@ -51,8 +49,7 @@ public class ClientTest {
     }
 
     @Test
-    public void saveNotExistsClientId_WithNotExistsName_ShouldInsert()
-            throws NotAvailableForUseException, ResourceNotFoundException {
+    public void saveNotExistsClientId_WithNotExistsName_ShouldInsert() throws NotAvailableForUseException {
 
         ClientDto clientDto = new ClientDto();
         clientDto.setName(NEW_CLIENT_NAME);
@@ -67,7 +64,7 @@ public class ClientTest {
     }
 
     @Test
-    public void saveNotExistsClientId_WithExistsName_ShoulThrowNameAlreadyExistsException() {
+    public void saveNotExistsClientId_WithExistsName_ShoulThrowNotAvailableForUseException() {
         List<Client> list = new ArrayList<>();
         list.add(mock(Client.class));
 
@@ -87,8 +84,7 @@ public class ClientTest {
     }
 
     @Test
-    public void saveExistsClientId_WithNotExistsName_ShouldUpdate()
-            throws NotAvailableForUseException, ResourceNotFoundException {
+    public void saveExistsClientId_WithNotExistsName_ShouldUpdate() throws NotAvailableForUseException {
         ClientDto clientDto = new ClientDto();
         clientDto.setName(NEW_CLIENT_NAME);
 
@@ -102,7 +98,7 @@ public class ClientTest {
     }
 
     @Test
-    public void saveExistsClientId_WithExistsName_ShoulThrowNameAlreadyExistsException() {
+    public void saveExistsClientId_WithExistsName_ShoulThrowNotAvailableForUseException() {
         List<Client> list = new ArrayList<>();
         list.add(mock(Client.class));
 
@@ -116,23 +112,6 @@ public class ClientTest {
             fail("Exception expected");
         } catch (NotAvailableForUseException e) {
             assertEquals(NotAvailableForUseException.class, e.getClass());
-        } catch (Exception e) {
-            fail("wrong exception thrown");
-        }
-    }
-
-    @Test
-    public void saveWithWrongClientId_ShouldThrowResourceNotFoundException() {
-        ClientDto clientDto = new ClientDto();
-        clientDto.setName(NEW_CLIENT_NAME);
-
-        when(clientRepository.findById(NEW_CLIENT_ID)).thenReturn(Optional.empty());
-
-        try {
-            clientService.save(NEW_CLIENT_ID, clientDto);
-            fail("Exception expected");
-        } catch (ResourceNotFoundException e) {
-            assertEquals(ResourceNotFoundException.class, e.getClass());
         } catch (Exception e) {
             fail("wrong exception thrown");
         }

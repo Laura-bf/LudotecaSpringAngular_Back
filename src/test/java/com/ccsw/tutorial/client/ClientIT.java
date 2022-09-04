@@ -122,14 +122,14 @@ public class ClientIT {
     }
 
     @Test
-    public void updateWithNotExistId_ShouldReturnNotFound() {
+    public void updateWithNotExistId_ShouldReturnInternalServerError() {
         ClientDto clientDto = new ClientDto();
         clientDto.setName(NEW_CLIENT_NAME);
 
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + NEW_CLIENT_ID,
                 HttpMethod.PUT, new HttpEntity<>(clientDto), Void.class);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 
     @Test
@@ -145,10 +145,10 @@ public class ClientIT {
     }
 
     @Test
-    public void deleteWithNotExistId_ShouldReturnNotFound() {
+    public void deleteWithNotExistId_ShouldReturnInternalServerError() {
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + NEW_CLIENT_ID,
                 HttpMethod.DELETE, null, Void.class);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
 }
