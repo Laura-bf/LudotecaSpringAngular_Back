@@ -24,11 +24,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public void save(Long id, ClientDto clientDto) throws NotAvailableForUseException, EmptyMandatoryFieldException {
-        if (clientDto.getName().equals(""))
-            throw new EmptyMandatoryFieldException("Name cannot be empty");
-
-        if (!this.clientRepository.findByName(clientDto.getName()).isEmpty())
-            throw new NotAvailableForUseException("Name already registered");
+        checkNameInput(clientDto.getName());
 
         Client client = null;
 
@@ -40,6 +36,14 @@ public class ClientServiceImpl implements ClientService {
         client.setName(clientDto.getName());
 
         this.clientRepository.save(client);
+    }
+
+    private void checkNameInput(String name) throws EmptyMandatoryFieldException, NotAvailableForUseException {
+        if (name.equals(""))
+            throw new EmptyMandatoryFieldException("Name cannot be empty");
+
+        if (!this.clientRepository.findByName(name).isEmpty())
+            throw new NotAvailableForUseException("Name already registered");
     }
 
     @Override

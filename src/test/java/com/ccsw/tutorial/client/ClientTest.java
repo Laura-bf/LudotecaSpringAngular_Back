@@ -28,6 +28,7 @@ public class ClientTest {
 
     private static final String EXISTS_CLIENT_NAME = "repeatedName";
     private static final String NEW_CLIENT_NAME = "Aidan Payne";
+    private static final String EMPTY_CLIENT_NAME = "";
     private static final Long EXISTS_CLIENT_ID = 1L;
 
     @Mock
@@ -88,7 +89,8 @@ public class ClientTest {
     @Test
     public void saveWithNotExistId_WithEmptyName_ShouldThrowEmptyMandatoryFieldException() {
         ClientDto clientDto = new ClientDto();
-        clientDto.setName("");
+        clientDto.setName(EMPTY_CLIENT_NAME);
+
         try {
             clientService.save(null, clientDto);
             fail("Exception expected");
@@ -103,6 +105,7 @@ public class ClientTest {
     @Test
     public void saveExistsClientId_WithNotExistsName_ShouldUpdate()
             throws NotAvailableForUseException, EmptyMandatoryFieldException {
+
         ClientDto clientDto = new ClientDto();
         clientDto.setName(NEW_CLIENT_NAME);
 
@@ -117,6 +120,7 @@ public class ClientTest {
 
     @Test
     public void saveExistsClientId_WithExistsName_ShoulThrowNotAvailableForUseException() {
+
         List<Client> list = new ArrayList<>();
         list.add(mock(Client.class));
 
@@ -137,8 +141,9 @@ public class ClientTest {
 
     @Test
     public void saveWithExistId_WithEmptyName_ShouldThrowEmptyMandatoryFieldException() {
+
         ClientDto clientDto = new ClientDto();
-        clientDto.setName("");
+        clientDto.setName(EMPTY_CLIENT_NAME);
 
         Client client = mock(Client.class);
 

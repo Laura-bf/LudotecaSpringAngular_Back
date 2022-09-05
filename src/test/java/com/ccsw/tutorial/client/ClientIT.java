@@ -42,10 +42,13 @@ public class ClientIT {
     ParameterizedTypeReference<List<ClientDto>> responseType = new ParameterizedTypeReference<List<ClientDto>>() {
     };
 
+    private ResponseEntity<List<ClientDto>> findAllClients() {
+        return restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.GET, null, responseType);
+    }
+
     @Test
     public void findAll_ShouldReturnAllClients() {
-        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> response = findAllClients();
 
         assertNotNull(response);
         assertEquals(TOTAL_CLIENTS_IN_DB, response.getBody().size());
@@ -58,8 +61,7 @@ public class ClientIT {
 
         restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT, new HttpEntity<>(clientDto), void.class);
 
-        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> response = findAllClients();
 
         assertNotNull(response);
         assertEquals(TOTAL_CLIENTS_IN_DB + 1, response.getBody().size());
@@ -73,11 +75,10 @@ public class ClientIT {
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT,
                 new HttpEntity<>(clientDto), void.class);
 
-        ResponseEntity<List<ClientDto>> responseAfterPut = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> responseAfterSave = findAllClients();
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
-        assertEquals(TOTAL_CLIENTS_IN_DB, responseAfterPut.getBody().size());
+        assertEquals(TOTAL_CLIENTS_IN_DB, responseAfterSave.getBody().size());
     }
 
     @Test
@@ -88,11 +89,10 @@ public class ClientIT {
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT,
                 new HttpEntity<>(clientDto), void.class);
 
-        ResponseEntity<List<ClientDto>> responseAfterPut = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> responseAfterSave = findAllClients();
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals(TOTAL_CLIENTS_IN_DB, responseAfterPut.getBody().size());
+        assertEquals(TOTAL_CLIENTS_IN_DB, responseAfterSave.getBody().size());
     }
 
     @Test
@@ -104,8 +104,7 @@ public class ClientIT {
         restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + EXIST_CLIENT_ID, HttpMethod.PUT,
                 new HttpEntity<>(clientDto), void.class);
 
-        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> response = findAllClients();
 
         ClientDto updatedClient = response.getBody().stream().filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst()
                 .orElse(null);
@@ -120,16 +119,14 @@ public class ClientIT {
         clientDto.setId(EXIST_CLIENT_ID);
         clientDto.setName(EXIST_CLIENT_NAME);
 
-        ResponseEntity<List<ClientDto>> responseBeforeUpdate = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> responseBeforeUpdate = findAllClients();
         ClientDto clientBeforeUpdate = responseBeforeUpdate.getBody().stream()
                 .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
 
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + EXIST_CLIENT_ID,
                 HttpMethod.PUT, new HttpEntity<>(clientDto), void.class);
 
-        ResponseEntity<List<ClientDto>> responseAfterUpdate = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> responseAfterUpdate = findAllClients();
         ClientDto clientAfterUpdate = responseAfterUpdate.getBody().stream()
                 .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
 
@@ -143,16 +140,14 @@ public class ClientIT {
         clientDto.setId(EXIST_CLIENT_ID);
         clientDto.setName(EMPTY_CLIENT_NAME);
 
-        ResponseEntity<List<ClientDto>> responseBeforeUpdate = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> responseBeforeUpdate = findAllClients();
         ClientDto clientBeforeUpdate = responseBeforeUpdate.getBody().stream()
                 .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
 
         ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + EXIST_CLIENT_ID,
                 HttpMethod.PUT, new HttpEntity<>(clientDto), void.class);
 
-        ResponseEntity<List<ClientDto>> responseAfterUpdate = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> responseAfterUpdate = findAllClients();
         ClientDto clientAfterUpdate = responseAfterUpdate.getBody().stream()
                 .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
 
@@ -175,8 +170,7 @@ public class ClientIT {
     public void deleteWithExistId_ShoulDeleteClient() {
         restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + EXIST_CLIENT_ID, HttpMethod.DELETE, null, Void.class);
 
-        ResponseEntity<List<ClientDto>> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
-                HttpMethod.GET, null, responseType);
+        ResponseEntity<List<ClientDto>> response = findAllClients();
 
         assertNotNull(response);
         assertEquals(TOTAL_CLIENTS_IN_DB - 1, response.getBody().size());
@@ -190,4 +184,5 @@ public class ClientIT {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
     }
+
 }
