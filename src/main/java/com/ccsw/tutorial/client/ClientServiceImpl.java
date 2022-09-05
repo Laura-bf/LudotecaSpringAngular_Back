@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.ccsw.tutorial.client.model.Client;
 import com.ccsw.tutorial.client.model.ClientDto;
+import com.ccsw.tutorial.exception.EmptyMandatoryFieldException;
 import com.ccsw.tutorial.exception.NotAvailableForUseException;
 
 @Service
@@ -22,7 +23,9 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void save(Long id, ClientDto clientDto) throws NotAvailableForUseException {
+    public void save(Long id, ClientDto clientDto) throws NotAvailableForUseException, EmptyMandatoryFieldException {
+        if (clientDto.getName().equals(""))
+            throw new EmptyMandatoryFieldException("Name cannot be empty");
 
         if (!this.clientRepository.findByName(clientDto.getName()).isEmpty())
             throw new NotAvailableForUseException("Name already registered");

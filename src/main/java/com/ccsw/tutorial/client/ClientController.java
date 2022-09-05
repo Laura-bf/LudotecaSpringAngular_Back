@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ccsw.tutorial.client.model.ClientDto;
+import com.ccsw.tutorial.exception.EmptyMandatoryFieldException;
 import com.ccsw.tutorial.exception.NotAvailableForUseException;
 import com.devonfw.module.beanmapping.common.api.BeanMapper;
 
@@ -35,7 +36,7 @@ public class ClientController {
 
     @PutMapping(path = { "", "/{id}" })
     public void save(@PathVariable(name = "id", required = false) Long id, @RequestBody ClientDto clientDto)
-            throws NotAvailableForUseException {
+            throws NotAvailableForUseException, EmptyMandatoryFieldException {
         this.clientService.save(id, clientDto);
     }
 

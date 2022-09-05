@@ -20,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.ccsw.tutorial.client.model.Client;
 import com.ccsw.tutorial.client.model.ClientDto;
+import com.ccsw.tutorial.exception.EmptyMandatoryFieldException;
 import com.ccsw.tutorial.exception.NotAvailableForUseException;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +50,8 @@ public class ClientTest {
     }
 
     @Test
-    public void saveNotExistsClientId_WithNotExistsName_ShouldInsert() throws NotAvailableForUseException {
+    public void saveNotExistsClientId_WithNotExistsName_ShouldInsert()
+            throws NotAvailableForUseException, EmptyMandatoryFieldException {
 
         ClientDto clientDto = new ClientDto();
         clientDto.setName(NEW_CLIENT_NAME);
@@ -84,7 +86,23 @@ public class ClientTest {
     }
 
     @Test
-    public void saveExistsClientId_WithNotExistsName_ShouldUpdate() throws NotAvailableForUseException {
+    public void saveWithNotExistId_WithEmptyName_ShouldThrowEmptyMandatoryFieldException() {
+        ClientDto clientDto = new ClientDto();
+        clientDto.setName("");
+        try {
+            clientService.save(null, clientDto);
+            fail("Exception expected");
+        } catch (EmptyMandatoryFieldException e) {
+            assertEquals(EmptyMandatoryFieldException.class, e.getClass());
+        } catch (Exception e) {
+            fail("wrong exception thrown");
+        }
+
+    }
+
+    @Test
+    public void saveExistsClientId_WithNotExistsName_ShouldUpdate()
+            throws NotAvailableForUseException, EmptyMandatoryFieldException {
         ClientDto clientDto = new ClientDto();
         clientDto.setName(NEW_CLIENT_NAME);
 
@@ -115,5 +133,25 @@ public class ClientTest {
         } catch (Exception e) {
             fail("wrong exception thrown");
         }
+    }
+
+    @Test
+    public void saveWithExistId_WithEmptyName_ShouldThrowEmptyMandatoryFieldException() {
+        ClientDto clientDto = new ClientDto();
+        clientDto.setName("");
+
+        Client client = mock(Client.class);
+
+        when(clientRepository.findById(EXISTS_CLIENT_ID)).thenReturn(Optional.of(client));
+
+        try {
+            clientService.save(EXISTS_CLIENT_ID, clientDto);
+            fail("Exception expected");
+        } catch (EmptyMandatoryFieldException e) {
+            assertEquals(EmptyMandatoryFieldException.class, e.getClass());
+        } catch (Exception e) {
+            fail("wrong exception thrown");
+        }
+
     }
 }

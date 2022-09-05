@@ -31,6 +31,7 @@ public class ClientIT {
     public static final Long NEW_CLIENT_ID = 7L;
     public static final String EXIST_CLIENT_NAME = "Aidan Payne";
     public static final String NEW_CLIENT_NAME = "NameNotUsed";
+    public static final String EMPTY_CLIENT_NAME = "";
 
     @LocalServerPort
     private int port;
@@ -80,6 +81,21 @@ public class ClientIT {
     }
 
     @Test
+    public void saveWithoutId_WithEmptyName_ShouldReturnBadRequest() {
+        ClientDto clientDto = new ClientDto();
+        clientDto.setName(EMPTY_CLIENT_NAME);
+
+        ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH, HttpMethod.PUT,
+                new HttpEntity<>(clientDto), void.class);
+
+        ResponseEntity<List<ClientDto>> responseAfterPut = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
+                HttpMethod.GET, null, responseType);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(TOTAL_CLIENTS_IN_DB, responseAfterPut.getBody().size());
+    }
+
+    @Test
     public void updateWithExistId_WithNewName_ShouldUpdateClient() {
         ClientDto clientDto = new ClientDto();
         clientDto.setId(EXIST_CLIENT_ID);
@@ -118,6 +134,29 @@ public class ClientIT {
                 .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
 
         assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertEquals(clientBeforeUpdate.getName(), clientAfterUpdate.getName());
+    }
+
+    @Test
+    public void updateWithExistId_WithEmptyName_ShouldReturnBadRequest() {
+        ClientDto clientDto = new ClientDto();
+        clientDto.setId(EXIST_CLIENT_ID);
+        clientDto.setName(EMPTY_CLIENT_NAME);
+
+        ResponseEntity<List<ClientDto>> responseBeforeUpdate = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
+                HttpMethod.GET, null, responseType);
+        ClientDto clientBeforeUpdate = responseBeforeUpdate.getBody().stream()
+                .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
+
+        ResponseEntity<?> response = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH + EXIST_CLIENT_ID,
+                HttpMethod.PUT, new HttpEntity<>(clientDto), void.class);
+
+        ResponseEntity<List<ClientDto>> responseAfterUpdate = restTemplate.exchange(LOCALHOST + port + SERVICE_PATH,
+                HttpMethod.GET, null, responseType);
+        ClientDto clientAfterUpdate = responseAfterUpdate.getBody().stream()
+                .filter(c -> c.getId().equals(EXIST_CLIENT_ID)).findFirst().orElse(null);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(clientBeforeUpdate.getName(), clientAfterUpdate.getName());
     }
 
