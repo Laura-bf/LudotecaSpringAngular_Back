@@ -36,7 +36,7 @@ public class ClientController {
 
     @PutMapping(path = { "", "/{id}" })
     public void save(@PathVariable(name = "id", required = false) Long id, @RequestBody ClientDto clientDto)
-            throws NotAvailableForUseException, EmptyMandatoryFieldException {
+            throws EmptyMandatoryFieldException, NotAvailableForUseException {
         this.clientService.save(id, clientDto);
     }
 

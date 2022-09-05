@@ -38,12 +38,13 @@ public class ClientServiceImpl implements ClientService {
         this.clientRepository.save(client);
     }
 
-    private void checkNameInput(String name) throws EmptyMandatoryFieldException, NotAvailableForUseException {
-        if (name.equals(""))
+    private void checkNameInput(String name) throws NotAvailableForUseException, EmptyMandatoryFieldException {
+        if (name == null || name.equals(""))
             throw new EmptyMandatoryFieldException("Name cannot be empty");
 
         if (!this.clientRepository.findByName(name).isEmpty())
             throw new NotAvailableForUseException("Name already registered");
+
     }
 
     @Override
